@@ -7,14 +7,14 @@
 
 void URunAnimInstance::NativeInitializeAnimation()
 {
-	if (Pawn != nullptr)
-	{
-		MovementComponent = Pawn->GetMovementComponent();
-
-	}
-	else
+	if (Pawn == nullptr)
 	{
 		Pawn = TryGetPawnOwner();
+	}
+	
+	if (IsValid(Pawn))
+	{
+		MovementComponent = Pawn->GetMovementComponent();
 	}
 
 }
