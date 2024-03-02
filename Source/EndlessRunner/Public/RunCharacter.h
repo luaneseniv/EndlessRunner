@@ -13,7 +13,9 @@ class ENDLESSRUNNER_API ARunCharacter : public ACharacter
 
 public:
 	ARunCharacter();
-	// virtual void Tick(float DeltaTime) override;
+
+	virtual void Tick(float DeltaTime) override;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true));
@@ -26,6 +28,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void MoveLeft();
+
+	UFUNCTION()
+	void MoveRight();
+
+	UFUNCTION()
+	void MoveDown();
 
 
 };
