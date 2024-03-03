@@ -4,6 +4,7 @@
 #include "RunCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 //#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -20,7 +21,14 @@ ARunCharacter::ARunCharacter()
 	Camera->SetupAttachment(CameraArm);
 	Camera->bUsePawnControlRotation = false;
 
-
+	// Set Default value for Character Movement Component
+	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
+	if (MovementComp)
+	{
+		MovementComp->JumpZVelocity = 600.0f;
+		MovementComp->MaxWalkSpeed = 1500.0f;
+		MovementComp->AirControl = 0.2f;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -29,7 +37,6 @@ void ARunCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 }
-
 
 void ARunCharacter::Tick(float DeltaTime)
 {
@@ -53,24 +60,22 @@ void ARunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("MoveLeft", IE_Pressed, this, &ARunCharacter::MoveLeft);
 	PlayerInputComponent->BindAction("MoveRight", IE_Pressed, this, &ARunCharacter::MoveRight);
 	PlayerInputComponent->BindAction("MoveDown", IE_Pressed, this, &ARunCharacter::MoveDown);
-
-
 }
 
 void ARunCharacter::MoveLeft()
 {
-	UE_LOG(LogTemp, Display, TEXT("Character Move Left"));
+	UE_LOG(LogTemp, Warning, TEXT("Character Move Left"));
 
 }
 
 void ARunCharacter::MoveRight()
 {
-	UE_LOG(LogTemp, Display, TEXT("Character Move Right"));
+	UE_LOG(LogTemp, Warning, TEXT("Character Move Right"));
 }
 
 void ARunCharacter::MoveDown()
 {
-	UE_LOG(LogTemp, Display, TEXT("Character Move Down"));
+	UE_LOG(LogTemp, Warning, TEXT("Character Move Down"));
 }
 
 
