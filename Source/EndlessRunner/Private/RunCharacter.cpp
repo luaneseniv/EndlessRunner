@@ -10,7 +10,7 @@
 // Sets default values
 ARunCharacter::ARunCharacter()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Arm"));
 	CameraArm->TargetArmLength = 350.0f;
