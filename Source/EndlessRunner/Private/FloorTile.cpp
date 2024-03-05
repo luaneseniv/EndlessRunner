@@ -2,7 +2,6 @@
 
 
 #include "FloorTile.h"
-#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 
 // Sets default values
@@ -33,6 +32,7 @@ AFloorTile::AFloorTile()
 	FloorTriggerBox->SetupAttachment(SceneRoot);
 	FloorTriggerBox->SetBoxExtent(FVector(32.0f, 500.0f, 200.0f));
 	FloorTriggerBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+
 }
 
 // Called when the game starts or when spawned
@@ -43,9 +43,9 @@ void AFloorTile::BeginPlay()
 }
 
 // Called every frame
-void AFloorTile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
+//void AFloorTile::Tick(float DeltaTime)
+//{
+//	Super::Tick(DeltaTime);
+//
+//}
 

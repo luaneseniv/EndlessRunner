@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/Engine.h"
 //#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -64,18 +65,20 @@ void ARunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void ARunCharacter::MoveLeft()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Character Move Left"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("Move Left Pressed!"));
 
 }
 
 void ARunCharacter::MoveRight()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Character Move Right"));
+	//UE_LOG(LogTemp, Warning, TEXT("Character Move Right"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("Move Right Pressed!"));
 }
 
 void ARunCharacter::MoveDown()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Character Move Down"));
+	//UE_LOG(LogTemp, Warning, TEXT("Character Move Down"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("Move Down Pressed!"));
 }
 
 

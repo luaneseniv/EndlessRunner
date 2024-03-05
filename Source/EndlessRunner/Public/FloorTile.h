@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/ArrowComponent.h"
 #include "FloorTile.generated.h"
 
 class USceneComponent;
 class UStaticMeshComponent;
-class UArrowComponent;
 class UBoxComponent;
 
 UCLASS()
@@ -19,6 +19,8 @@ class ENDLESSRUNNER_API AFloorTile : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AFloorTile();
+
+	//virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* SceneRoot;
@@ -41,12 +43,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* FloorTriggerBox;
 
+	FORCEINLINE const FTransform& GetAttachTransform() const
+	{
+		return AttachPoint->GetComponentTransform();
+	}
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	
 
 };
