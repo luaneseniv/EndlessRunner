@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/ArrowComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "FloorTile.generated.h"
 
 class USceneComponent;
 class UStaticMeshComponent;
 class UBoxComponent;
+class AEndlessRunnerGameModeBase;
 
 UCLASS()
 class ENDLESSRUNNER_API AFloorTile : public AActor
@@ -49,9 +51,19 @@ public:
 	}
 
 protected:
-	// Called when the game starts or when spawned
+	UPROPERTY(VisibleInstanceOnly)
+	AEndlessRunnerGameModeBase* RunGameMode;
+
+	UPROPERTY()
+	FTimerHandle DestroyHandle;
+
+	UFUNCTION()
+	void OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void DestroyFloorTile();
+
 	virtual void BeginPlay() override;
 
 	
-
 };

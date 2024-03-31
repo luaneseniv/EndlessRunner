@@ -3,6 +3,8 @@
 
 #include "FloorTile.h"
 #include "Components/BoxComponent.h"
+#include "EndlessRunner/EndlessRunnerGameModeBase.h"
+#include "RunCharacter.h"
 
 // Sets default values
 AFloorTile::AFloorTile()
@@ -39,7 +41,33 @@ AFloorTile::AFloorTile()
 void AFloorTile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	RunGameMode = Cast<AEndlessRunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	
+	check(RunGameMode)
+	FloorTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AFloorTile::OnTriggerBoxOverlap);
+}
+
+void AFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ARunCharacter* RunCharacter = Cast<ARunCharacter>(OtherActor);
+
+	if (RunCharacter)
+	{
+		RunGameMode->AddFloorTile();
+
+		GetWorldTimerManager().SetTimer(DestroyHandle, this, &AFloorTile::DestroyFloorTile, 2.0f, false);
+	}
+}
+
+void AFloorTile::DestroyFloorTile()
+{
+	if (DestroyHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(DestroyHandle);
+	}
+
+	this->Destroy();
 }
 
 // Called every frame
