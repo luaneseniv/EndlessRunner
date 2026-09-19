@@ -17,6 +17,10 @@ _Assets/
 *.VC.db
 *.VC.opendb
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> b4474a9 (- Updated to UE5.7.)
 # Binary Files
 Binaries/*
 Plugins/*/Binaries/*
@@ -39,6 +43,9 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+<<<<<<< HEAD
 
 # Mixamo files
 Content/Assets/Mixamo/
+=======
+>>>>>>> b4474a9 (- Updated to UE5.7.)
