@@ -1,6 +1,7 @@
 # Visual Studio 2015 user specific files
 .vs/
 .vsconfig
+.idea/
 
 # Asset files
 _Assets/
@@ -45,9 +46,6 @@ _Assets/
 *.VC.db
 *.VC.opendb
 
-# Precompiled Assets
-SourceArt/**/*.png
-SourceArt/**/*.tga
 
 # Binary Files
 Binaries/*
@@ -80,4 +78,3 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
-Platforms/HoloLens/Config/HoloLensEngine.ini
