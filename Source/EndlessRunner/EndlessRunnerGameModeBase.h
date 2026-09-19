@@ -7,6 +7,10 @@
 #include "FloorTile.h"
 #include "EndlessRunnerGameModeBase.generated.h"
 
+class UInputAction;
+class UInputMappingContext;
+class AFloorTile;
+
 /**
  * 
  */
@@ -16,22 +20,45 @@ class ENDLESSRUNNER_API AEndlessRunnerGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, Category="Configs")
-	TSubclassOf<AFloorTile> FloorTileClass;
-
-	UPROPERTY(EditAnyWhere, Category="Configs")
-	int NumInitializeFloorTiles = 10;
-
-	UPROPERTY(VisibleInstanceOnly, Category="Runtime")
-	FTransform NextSpawnPoint;
-
-	UFUNCTION(BlueprintCallable)
+	// FUNCTIONS
+	UFUNCTION(BlueprintCallable, Category="Endless Runner")
 	void CreateInitialFloorTiles();
 
-	UFUNCTION(BlueprintCallable)
-	void AddFloorTile();
+	UFUNCTION(BlueprintCallable, Category="Endless Runner")
+	AFloorTile* AddFloorTile(const bool bSpawnObstacle);
+
+	UFUNCTION(BlueprintCallable, Category="Endless Runner")
+	void UpdateCoins();
 	
+	UFUNCTION(BlueprintCallable, Category="Endless Runner")
+	void RestartLevel() const;
+
+	// --------------------
+	// PROPERTIES
+	/* Class of the floor to spawn */
+	UPROPERTY(EditAnywhere, Category="Endless Runner|Floor Tile")
+	TSubclassOf<AFloorTile> FloorTileClass;
+
+	/* Number of initial floor tiles to create */
+	UPROPERTY(EditAnyWhere, Category="Endless Runner|Floor Tile")
+	int NumInitializeFloorTiles = 10;
+
+	/* Location to spawn the next tile */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Endless Runner|Runtime")
+	FTransform NextSpawnPoint;
+
+	/* Location to move between lanes */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Endless Runner|Floor Tile")
+	TArray<float> LaneSwitchValues;
+
+	/* Number of coins collected */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Endless Runner|Runtime")
+	int32 Coins = 0;
+	
+
+
 protected:
 	virtual void BeginPlay() override;
 
+	
 };

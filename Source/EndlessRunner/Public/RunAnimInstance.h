@@ -10,6 +10,9 @@
  * 
  */
 
+class APawn;
+class UPawnMovementComponent;
+
 UCLASS()
 class ENDLESSRUNNER_API URunAnimInstance : public UAnimInstance
 {
@@ -24,10 +27,10 @@ public:
 	bool bIsInAir;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Movement")
-	class APawn* Pawn;
+	TObjectPtr<APawn> Pawn;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Movement")
-	class UPawnMovementComponent* MovementComponent;
+	TObjectPtr<UPawnMovementComponent> MovementComponent;
 
 	virtual void NativeInitializeAnimation() override;
 
