@@ -3,6 +3,7 @@
 
 #include "Obstacle.h"
 #include "RunCharacter.h"
+#include "Component/PoolActorComponent.h"
 
 
 // Sets default values

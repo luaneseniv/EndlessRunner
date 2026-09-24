@@ -3,10 +3,12 @@
 
 #include "FloorTile.h"
 #include "Components/BoxComponent.h"
+#include "Components/SplineComponent.h"
 #include "EndlessRunner/EndlessRunnerGameModeBase.h"
 #include "RunCharacter.h"
 #include "Obstacle.h"
 #include "Actor/Coin.h"
+#include "Component/PoolActorComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -39,13 +41,20 @@ AFloorTile::AFloorTile()
 	FloorTriggerBox->SetBoxExtent(FVector(32.0f, 500.0f, 200.0f));
 	FloorTriggerBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
-	// Add callback to trigger box when player overlaps -> Spawn tile
+	// Add callback to trigger box when player overlaps -> Accuires new tile and release old tile
 	FloorTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AFloorTile::OnTriggerBoxOverlap);
 
+	CoinSpline = CreateDefaultSubobject<USplineComponent>("Coin Spline");
+	CoinSpline->SetupAttachment(GetRootComponent());
+
+	PoolActorComponent = CreateDefaultSubobject<UPoolActorComponent>("PoolActorComponent");
 }
 
+UPoolActorComponent* AFloorTile::GetPoolActorComponent()
+{
+	return PoolActorComponent;
+}
 
-// Called when the game starts or when spawned
 void AFloorTile::BeginPlay()
 {
 	Super::BeginPlay();
@@ -53,11 +62,16 @@ void AFloorTile::BeginPlay()
 	// Get GameMode
 	RunGameMode = Cast<AEndlessRunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	check(RunGameMode)
+	if (RunGameMode == nullptr) return;
+
+	InitializeCoinTransforms();
 }
 
 void AFloorTile::GetLanesLocation(TArray<float>& LanesLocation) const
 {
+	// |			|			|			|	^ X Axis
+	// |			|			|			|	|
+	// |	Left	|	Center	|	Right	|	 -> Y Axis
 	LanesLocation.Empty();
 	// has to be in this order Left -> Center -> Right
 	LanesLocation.Add(LeftLane->GetComponentLocation().Y);
@@ -65,84 +79,60 @@ void AFloorTile::GetLanesLocation(TArray<float>& LanesLocation) const
 	LanesLocation.Add(RightLane->GetComponentLocation().Y);
 }
 
+
 void AFloorTile::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (RunGameMode == nullptr) return;
+
 	if (ARunCharacter* RunCharacter = Cast<ARunCharacter>(OtherActor))
 	{
-		RunGameMode->AddFloorTile(true);
-
-		GetWorldTimerManager().SetTimer(DestroyHandle, this, &AFloorTile::DestroyFloorTile, 2.0f, false);
-	}
-}
-
-void AFloorTile::DestroyFloorTile()
-{
-	if (DestroyHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(DestroyHandle);
-	}
-
-	this->Destroy();
-}
-
-
-void AFloorTile::SpawnObstacle(UArrowComponent* Lane)
-{
-	UWorld* World = GetWorld();
-	if (World != nullptr && ObstacleClasses.IsEmpty() == false)
-	{
-		FActorSpawnParameters SpawnParameters;
-		// Always spawn Obstacle, avoid collision issues
-		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		const FTransform SpawningTransform = Lane->GetComponentTransform();
-
-		// depend on spawn rate, decide to spawn obstacle or not
-		if (ShouldSpawnObstacle())
-		{
-			// Get random obstacle class and spawn it
-			const uint32 SelectedIndex = FMath::RandRange(0, ObstacleClasses.Num() - 1);
-			const TSubclassOf<AObstacle> SelectedObstacleClass = ObstacleClasses[SelectedIndex];
-
-			const FVector TestLocation = FVector::ZeroVector;
-			const FRotator TestRotator = FRotator::ZeroRotator;
+		RunGameMode->AddFloorTile();
 		
-			if (SelectedObstacleClass != nullptr)
-			{
-				World->SpawnActor<AObstacle>(SelectedObstacleClass, SpawningTransform, SpawnParameters);
-			}
-		}
-		else
+		if (OnEndOfTile.IsBound())
 		{
-			// If the Obstacle is not spawned -> Spawn coin
-			SpawnCoin(SpawningTransform);
+			OnEndOfTile.Broadcast(RunGameMode->DeactivateTime);
+			OnEndOfTile.Clear();
 		}
-
-		// TEST
-		SpawnCoinsOnLane(SpawningTransform);
+		ReleaseFloorTile(RunGameMode->DeactivateTime);
 	}
 }
 
-void AFloorTile::SpawnObstacleOnLanes()
+void AFloorTile::ReleaseFloorTile(float InDelay)
 {
-	if (!ObstacleClasses.IsEmpty())
+	if (PoolActorComponent)
 	{
-		SpawnObstacle(CenterLane);
-		SpawnObstacle(LeftLane);
-		SpawnObstacle(RightLane);
+		PoolActorComponent->ScheduleRecycle(InDelay);
 	}
 }
 
-ACoin* AFloorTile::SpawnCoin(const FTransform& SpawnTransform)
+void AFloorTile::InitializeCoinTransforms()
 {
-	UWorld* World = GetWorld();
-	if (CoinClass != nullptr && World != nullptr)
+	if (!IsValid(CoinSpline)) return;
+
+	CoinTransforms.Empty();
+
+	float SplineLength = CoinSpline->GetSplineLength();
+	int NumCoins = FMath::TruncToInt(SplineLength / RunGameMode->CoinSpacing);
+
+	CoinTransforms.Reserve(NumCoins);
+
+	for (int i = 0; i < NumCoins; ++i)
 	{
-		FActorSpawnParameters SpawnParameters;
-		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		
-		return World->SpawnActor<ACoin>(CoinClass, SpawnTransform, SpawnParameters);
+		FTransform TransformAtDistance = CoinSpline->GetTransformAtDistanceAlongSpline(RunGameMode->CoinSpacing * i, ESplineCoordinateSpace::Local);
+		TransformAtDistance.SetLocation(TransformAtDistance.GetLocation() + CoinSpline->GetRelativeLocation() + RunGameMode->CoinOffset);
+		TransformAtDistance.SetRotation(FQuat::Identity);
+
+		CoinTransforms.Add(TransformAtDistance);
 	}
-	return nullptr;
 }
 
+void AFloorTile::GetCoinTransforms(TArray<FTransform>& OutTransforms) const
+{
+	OutTransforms.Reserve(CoinTransforms.Num());
+
+	for (const FTransform& LocalTransform : CoinTransforms)
+	{
+		OutTransforms.Emplace(LocalTransform * GetActorTransform());
+	}
+}
 
