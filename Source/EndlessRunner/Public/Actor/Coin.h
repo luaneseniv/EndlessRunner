@@ -11,13 +11,15 @@ class USphereComponent;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ENDLESSRUNNER_API ACoin : public ACollectible
 {
 	GENERATED_BODY()
 
 public:
 	ACoin();
+
+	virtual UPoolActorComponent* GetPoolActorComponent() override;
 
 	// ===================
 	// PROPERTIES
@@ -27,10 +29,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
 	TObjectPtr<UStaticMeshComponent> CoinMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
-	TObjectPtr<URotatingMovementComponent> RotateComponent;
-
 protected:
 	virtual void OnCollected(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+
+private:
+	UPROPERTY()
+	TObjectPtr<UPoolActorComponent> PoolActorComponent;
 };

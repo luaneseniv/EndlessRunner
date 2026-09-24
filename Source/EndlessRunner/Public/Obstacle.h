@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Obstacle.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class ENDLESSRUNNER_API AObstacle : public AActor
 {
 	GENERATED_BODY()

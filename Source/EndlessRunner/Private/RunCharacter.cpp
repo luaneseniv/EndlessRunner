@@ -80,13 +80,8 @@ void ARunCharacter::Tick(float DeltaTime)
 
 	if (IsAlive())
 	{
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(
-				12,
-				1.1f,
-				FColor::Green,
-				FString::Printf(TEXT("Distance: %fm"), (GetActorLocation().X * 0.01))
-				);
+		SPRINT(2, 1.0f, Green, "Distance: %fm", (GetActorLocation().X * 0.01));
+
 	}
 	
 }
@@ -109,9 +104,18 @@ void ARunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 // called in blueprint
 void ARunCharacter::ChangeLaneUpdate(const float Value)
 {
-	FVector Location = GetActorLocation();
-	Location.Y = FMath::Lerp(RunGameMode->LaneSwitchValues[CurrentLane], RunGameMode->LaneSwitchValues[NextLane], Value);
-	SetActorLocation(Location);
+	if (RunGameMode == nullptr && RunGameMode)
+	{
+		SPRINT_MESSAGE(Red, "ChangeLaneUpdate: Game Mode is not valid!");
+		return;
+	}
+
+	if (!RunGameMode->LaneSwitchValues.IsEmpty())
+	{
+		FVector Location = GetActorLocation();
+		Location.Y = FMath::Lerp(RunGameMode->LaneSwitchValues[CurrentLane], RunGameMode->LaneSwitchValues[NextLane], Value);
+		SetActorLocation(Location);
+	}
 }
 
 // called in blueprint
@@ -150,7 +154,7 @@ void ARunCharacter::Slide()
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OBSTACLE, ECR_Ignore);
 
 		// Play Animation montage
-		if (CharacterData != nullptr)
+		if (CharacterData != nullptr && CharacterData->SlideMontage != nullptr)
 		{
 			PlayAnimMontage(CharacterData->SlideMontage);
 		}

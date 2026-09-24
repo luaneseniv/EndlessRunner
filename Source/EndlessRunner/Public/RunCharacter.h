@@ -13,7 +13,7 @@ class AEndlessRunnerGameModeBase;
 class URunCharacterData;
 struct FInputActionValue;
 
-UCLASS()
+UCLASS(Abstract)
 class ENDLESSRUNNER_API ARunCharacter : public ACharacter, public IActionInterface
 {
 	GENERATED_BODY()

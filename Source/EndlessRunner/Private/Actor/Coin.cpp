@@ -5,6 +5,7 @@
 
 #include "RunCharacter.h"
 #include "Components/SphereComponent.h"
+#include "Component/PoolActorComponent.h"
 #include "GameFramework/RotatingMovementComponent.h"
 
 
@@ -17,11 +18,14 @@ ACoin::ACoin()
 	CoinMesh->SetupAttachment(RootComponent);
 	CoinMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	RotateComponent = CreateDefaultSubobject<URotatingMovementComponent>("Rotate Component");
-	RotateComponent->SetAutoActivate(true);
-	RotateComponent->RotationRate = FRotator(0.0f, 180.0f, 0.0f);
-
 	TriggerSphere->OnComponentBeginOverlap.AddDynamic(this, &ACoin::OnCollected);
+
+	PoolActorComponent = CreateDefaultSubobject<UPoolActorComponent>("PoolActorComponent");
+}
+
+UPoolActorComponent* ACoin::GetPoolActorComponent()
+{
+	return PoolActorComponent;
 }
 
 void ACoin::OnCollected(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -30,7 +34,8 @@ void ACoin::OnCollected(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	if (ARunCharacter* RunCharacter = Cast<ARunCharacter>(OtherActor))
 	{
 		RunCharacter->CollectCoin();
-		this->Destroy();
+
+		PoolActorComponent->Recycle();
 	}
 	
 }
