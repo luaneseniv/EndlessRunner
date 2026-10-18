@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 #pragma once
 
@@ -17,13 +17,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Obstacle")
 	virtual void OnHitObstacle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit );
 
-	// -------------------------
-	// PROPERTIES
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Obstacle")
 	TObjectPtr<USceneComponent> SceneRoot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Obstacle")
 	TObjectPtr<UStaticMeshComponent> ObstacleMesh;
 
+	UPROPERTY(EditAnywhere, Category = "Obstacle|Configs")
+	float MinCollideSpeed = 300.0f;
 	
 };

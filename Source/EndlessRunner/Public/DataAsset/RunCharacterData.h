@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "EndlessRunner/EndlessRunner.h"
 #include "RunCharacterData.generated.h"
 
 class UInputMappingContext;
@@ -31,4 +32,14 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Animation Montage")
 	TObjectPtr<UAnimMontage> SlideMontage;
+
+	// The amount of force that pulls the character down when jumping
+	UPROPERTY(EditAnywhere, Category="Action")
+	float PullDownAmount = 500.0f;
+
+	UPROPERTY(EditAnyWhere, Category = "Trace Hit")
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObstacleTypes;
+
+	UPROPERTY(EditAnyWhere, Category = "Trace Hit")
+	bool bDrawDebug;
 };

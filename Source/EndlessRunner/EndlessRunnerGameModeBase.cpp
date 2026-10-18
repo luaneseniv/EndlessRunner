@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 
 #include "EndlessRunnerGameModeBase.h"
@@ -8,7 +8,11 @@
 #include "Component/PoolActorComponent.h"
 #include "Interface/ActorPoolInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "UI/RunWidgetController.h"
+#include "UI/RunHUDWidget.h"
 
+
+#pragma region FPoolArray
 void FPoolArray::Initialize(TSubclassOf<AActor> ActorClass, int PoolSize, UWorld* InWorld)
 {
 	if (PoolSize <= 0)
@@ -27,7 +31,7 @@ void FPoolArray::Initialize(TSubclassOf<AActor> ActorClass, int PoolSize, UWorld
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(FVector(0.0, 0.0, -9000.0));
 
-	for (int i = 0; i < PoolSize; ++i)
+	for (int32 i = 0; i < PoolSize; ++i)
 	{
 		AActor* SpawnedActor = InWorld->SpawnActor(ActorClass, &SpawnTransform, SpawnParams);
 		
@@ -49,9 +53,10 @@ AActor* FPoolArray::SpawnAvailableActor(const FTransform& InTransform) const
 			}
 		}
 	}
-	SPRINT_MESSAGE(Red, "Pool does not have any available actor!");
+	SPRINT_CMSG(Red, "Pool does not have any available actor!");
 	return nullptr;
 }
+#pragma endregion
 
 
 void AEndlessRunnerGameModeBase::BeginPlay()
@@ -64,6 +69,35 @@ void AEndlessRunnerGameModeBase::BeginPlay()
 void AEndlessRunnerGameModeBase::RestartLevel() const
 {
 	UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), "RestartLevel");
+}
+
+
+FScore AEndlessRunnerGameModeBase::GetGameScore()
+{
+	FName PlayerName = NAME_None;
+	int32 RunDistance = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation().X * 0.01; //test
+
+	return FScore(PlayerName, CollectedCoins, RunDistance);
+}
+
+void AEndlessRunnerGameModeBase::SetupPlayerHUD(ACharacter* InCharacter)
+{
+	check(RunWidgetControllerClass);
+	check(HUDWidgetClass);
+
+	// Widget Controller
+	RunWidgetController = NewObject<URunWidgetController>(this, RunWidgetControllerClass);
+
+	RunWidgetController->SetupWidgetController(this, InCharacter);
+
+	//RunHUDWidget
+	RunHUDWidget = CreateWidget<URunHUDWidget>(GetWorld(), HUDWidgetClass);
+
+	RunHUDWidget->SetWidgetController(RunWidgetController);
+
+	RunWidgetController->BroadcastInitialValues();
+
+	RunHUDWidget->AddToViewport(999);
 }
 
 void AEndlessRunnerGameModeBase::InitializeActorPools()
@@ -102,7 +136,7 @@ void AEndlessRunnerGameModeBase::CreateInitialFloorTiles()
 	}
 	
 	// Create other floor tiles
-	for (int i = 0; i < MaxAcquiredFloorTiles; i++)
+	for (int32 i = 0; i < MaxAcquiredFloorTiles; ++i)
 	{
 		AddFloorTile();
 	}
@@ -112,10 +146,10 @@ AFloorTile* AEndlessRunnerGameModeBase::AddFloorTile()
 {
 	if (FloorTileClasses.IsEmpty()) return nullptr;
 
-	TArray<int> AvailableIndices;
-	int NewIndex = CachedSelectedSpawnIndex;
+	TArray<int32> AvailableIndices;
+	int32 NewIndex = CachedSelectedSpawnIndex;
 
-	for (int i = 0; i < FloorTileClasses.Num(); ++i)
+	for (int32 i = 0; i < FloorTileClasses.Num(); ++i)
 	{
 		if (i != CachedSelectedSpawnIndex)
 			AvailableIndices.Add(i);
@@ -157,7 +191,8 @@ AFloorTile* AEndlessRunnerGameModeBase::AddFloorTile()
 
 void AEndlessRunnerGameModeBase::UpdateCoins()
 {
-	ColledtedCoins += 1;
-	SPRINT(3, 20.0f, White, "Coin Collected: %d", ColledtedCoins);
+	CollectedCoins += 1;
+	
+	OnCoinUpdated.ExecuteIfBound(CollectedCoins);
 }
 

@@ -7,6 +7,8 @@
 UPoolActorComponent::UPoolActorComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	bCanAcquire = false;
+	bIsRecycling = false;
 }
 
 void UPoolActorComponent::BeginPlay()
@@ -50,7 +52,6 @@ void UPoolActorComponent::ScheduleRecycle(float InDelay)
 
 	if (!GetWorld())
 	{
-		SPRINT_MESSAGE(Red, "ScheduleRecycle: GetWorld() is not valid! Can not set timer!");
 		DeactivateActor();
 		return;
 	}

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 
 #include "Obstacle.h"
@@ -30,8 +30,14 @@ void AObstacle::OnHitObstacle(UPrimitiveComponent* HitComponent, AActor* OtherAc
 {
 	if (ARunCharacter* RunCharacter = Cast<ARunCharacter>(OtherActor))
 	{
+		float CollidedSpeed_Squared = RunCharacter->GetVelocity().SizeSquared2D();
+
+		// Only die when the collided speed is less than minimum collide speed
+		if (CollidedSpeed_Squared < FMath::Square(MinCollideSpeed))
+		{
 		RunCharacter->Death();
 	}
+}
 }
 
 

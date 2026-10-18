@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 #pragma once
 
@@ -27,6 +27,9 @@ public:
 	// PROPERTIES
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
 	TObjectPtr<USceneComponent> SceneRoot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Endless Runner|Sound")
+	TObjectPtr<USoundBase> PickupSound;
 
 protected:
 	UFUNCTION(BlueprintCallable, Category="Endless Runner|Collectible")

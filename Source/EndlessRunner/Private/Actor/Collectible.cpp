@@ -1,9 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
+
 
 
 #include "Actor/Collectible.h"
 #include "FloorTile.h"
 #include "Component/PoolActorComponent.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/Gameplaystatics.h"
+
 #include "RunCharacter.h"
 
 // Sets default values
@@ -25,6 +29,11 @@ UPoolActorComponent* ACollectible::GetPoolActorComponent()
 void ACollectible::OnCollected(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+
+	if (PickupSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, PickupSound, this->GetActorLocation());
+	}
 
 }
 

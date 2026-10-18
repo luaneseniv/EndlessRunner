@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
+
 
 
 #include "FloorTile.h"
@@ -38,7 +39,7 @@ AFloorTile::AFloorTile()
 
 	FloorTriggerBox = CreateDefaultSubobject<UBoxComponent>("Floor Trigger Box");
 	FloorTriggerBox->SetupAttachment(RootComponent);
-	FloorTriggerBox->SetBoxExtent(FVector(32.0f, 500.0f, 200.0f));
+	FloorTriggerBox->SetBoxExtent(FVector(32.0, 500.0, 200.0));
 	FloorTriggerBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
 	// Add callback to trigger box when player overlaps -> Accuires new tile and release old tile
@@ -116,7 +117,7 @@ void AFloorTile::InitializeCoinTransforms()
 
 	CoinTransforms.Reserve(NumCoins);
 
-	for (int i = 0; i < NumCoins; ++i)
+	for (int32 i = 0; i < NumCoins; ++i)
 	{
 		FTransform TransformAtDistance = CoinSpline->GetTransformAtDistanceAlongSpline(RunGameMode->CoinSpacing * i, ESplineCoordinateSpace::Local);
 		TransformAtDistance.SetLocation(TransformAtDistance.GetLocation() + CoinSpline->GetRelativeLocation() + RunGameMode->CoinOffset);

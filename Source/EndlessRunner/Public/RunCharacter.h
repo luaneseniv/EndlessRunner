@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 #pragma once
 
@@ -27,6 +27,10 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+	// ~ IActionInterface
+	virtual void I_EndSlide_AN() override;
+	// ~ End IActionInterface
+	
 	UFUNCTION(BlueprintImplementableEvent, Category="Endless Runner|Lane")
 	void OnChangeLane();
 
@@ -44,10 +48,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Endless Runner")
 	void CollectCoin();
-	
-	// ~ IActionInterface
-	virtual void I_EndSlide_AN() override;
-	// ~ End IActionInterface
+
+	int32 GetRunDistance() const;
+	FORCEINLINE bool IsAlive() const { return !bIsDeath; }
+
 	
 	// -------------------------
 	// PROPERTIES
@@ -61,14 +65,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
 	void SwitchLand(const FInputActionValue& InputValue);
-	
-	UFUNCTION()
 	void Slide();
-
-	UFUNCTION()
 	void EndSlide();
+	FORCEINLINE bool CanSlide() const { return !bIsSliding; }
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true));
@@ -77,20 +77,22 @@ private:
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true));
 	TObjectPtr<UCameraComponent> Camera;
 	
-	UPROPERTY(VisibleInstanceOnly, Category = "References")
+	UPROPERTY(EditAnywhere, Category="Endless Runner|Character Data")
+	TObjectPtr<URunCharacterData> CharacterData;
+	
+	UPROPERTY(Transient)
 	TObjectPtr<AEndlessRunnerGameModeBase> RunGameMode;
 	
-	UPROPERTY(EditAnywhere, Category="Character Data")
-	TObjectPtr<URunCharacterData> CharacterData;
+	UPROPERTY()
+	bool bCanSwitchLane = true;
 
 	UPROPERTY()
 	bool bIsSliding = false;
-	FORCEINLINE bool CanSlide() const { return !bIsSliding; }
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	FTimerHandle RestartGameHandle;
 
 	UPROPERTY()
 	bool bIsDeath = false;
-	FORCEINLINE bool IsAlive() const { return !bIsDeath; }
+	
 };

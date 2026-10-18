@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 #pragma once
 
@@ -7,9 +7,11 @@
 // Obstacle collision channel
 #define ECC_OBSTACLE ECC_GameTraceChannel1
 
+
 // Screen Printing
 #define SPRINT(Channel, Time, Color, Message, ...) if (GEngine) GEngine->AddOnScreenDebugMessage(Channel, Time, FColor::Color, FString::Printf(TEXT(Message), ##__VA_ARGS__))
-#define SPRINT_MESSAGE(Color, Message) SPRINT(-1, 3.0f, Color, Message)
+#define SPRINT_MSG(Message) SPRINT(-1, 3.0f, White, Message)
+#define SPRINT_CMSG(Color, Message) SPRINT(-1, 3.0f, Color, Message)
 #define SPRINT_VAR(Color, Message,...) SPRINT(-1, 3.0f, Color, Message, ##__VA_ARGS__)
 
 namespace EndlessRunner

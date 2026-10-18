@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 #include "EndlessRunner.h"
 #include "Modules/ModuleManager.h"

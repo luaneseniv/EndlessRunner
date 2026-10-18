@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
 
 #pragma once
 
@@ -9,7 +9,12 @@
 class UInputAction;
 class UInputMappingContext;
 class AFloorTile;
+class URunWidgetController;
+class URunHUDWidget;
 
+DECLARE_DELEGATE_OneParam(FOnCoinUpdated, int32 /*NumCoin*/);
+
+// TODO: Move the actor pool to UActorPoolSubsystem::UWorldSubsystem
 
 USTRUCT(BlueprintType)
 struct FPoolArray
@@ -17,6 +22,8 @@ struct FPoolArray
 	GENERATED_BODY()
 
 public:
+	FPoolArray() {}
+
 	void Initialize(TSubclassOf<AActor> ActorClass, int PoolSize, UWorld* InWorld);
 	AActor* SpawnAvailableActor(const FTransform& InTransform) const;
 
@@ -25,38 +32,56 @@ private:
 	TArray<TObjectPtr<AActor>> Actors;
 };
 
+USTRUCT(BlueprintType)
+struct FScore
+{
+	GENERATED_BODY()
+
+public:
+	FScore()
+		: PlayerName(NAME_None)
+		, RunDistance(0)
+		, NumCoins(0)
+	{ }
+
+	FScore(FName InPlayerName,  int32 InRunDistance, int32 InNumCoins)
+		: PlayerName(InPlayerName)
+		, RunDistance(InRunDistance)
+		, NumCoins(InNumCoins)
+	{ }
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Endless Runner|Score")
+	FName PlayerName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Endless Runner|Score")
+	int32 RunDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Endless Runner|Score")
+	int32 NumCoins;
+};
+
 UCLASS(Abstract)
 class ENDLESSRUNNER_API AEndlessRunnerGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
 public:
-	// FUNCTIONS
-	UFUNCTION(BlueprintCallable, Category="Endless Runner")
 	void CreateInitialFloorTiles();
-
-	UFUNCTION(BlueprintCallable, Category="Endless Runner")
 	AFloorTile* AddFloorTile();
-
-	UFUNCTION(BlueprintCallable, Category="Endless Runner")
-	void UpdateCoins();
-	
-	UFUNCTION(BlueprintCallable, Category="Endless Runner")
 	void RestartLevel() const;
+	void UpdateCoins();
 
-	UFUNCTION()
-	void InitializeActorPools();
+	FScore GetGameScore();
+	FORCEINLINE int32 GetNumCoins() const { return CollectedCoins; }
 
-	UFUNCTION()
-	void InitializePoolByClass(TSubclassOf<AActor> InClass, int PoolSize);
+	void SetupPlayerHUD(ACharacter* InCharacter);
 
-	// --------------------
-	// PROPERTIES
+
 	/* Number of initial floor tiles to create */
 	UPROPERTY(EditAnyWhere, Category="Endless Runner|Configs")
 	int MaxAcquiredFloorTiles = 1;
 
-	/* After this time, the object is return to the pool */
+	/* Time delay in seconds before the actor is returned to the pool */
 	UPROPERTY(EditAnyWhere, Category = "Endless Runner|Configs")
 	float DeactivateTime = 1.0f;
 
@@ -75,26 +100,42 @@ public:
 	FVector CoinOffset;
 
 	/* Location to spawn the next tile */
-	UPROPERTY(BlueprintReadOnly, Category="Endless Runner|Runtime")
+	UPROPERTY(Transient)
 	FTransform NextSpawnPoint;
 
 	/* Location to move between lanes */
-	UPROPERTY(BlueprintReadOnly, Category="Endless Runner|Floor Tile")
+	UPROPERTY(Transient)
 	TArray<float> LaneSwitchValues;
 
-	/* Number of coins collected */
-	UPROPERTY(BlueprintReadOnly, Category="Endless Runner|Runtime")
-	int32 ColledtedCoins = 0;
-	
-
+	FOnCoinUpdated OnCoinUpdated;
 
 protected:
 	virtual void BeginPlay() override;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Endless Runner|UI")
+	TSubclassOf<UObject> RunWidgetControllerClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Endless Runner|UI")
+	TSubclassOf<UUserWidget> HUDWidgetClass;
+
 private:
-	UPROPERTY()
-	int CachedSelectedSpawnIndex;
+	void InitializeActorPools();
+	void InitializePoolByClass(TSubclassOf<AActor> InClass, int PoolSize);
+
+	UPROPERTY(Transient)
+	uint8 CachedSelectedSpawnIndex;
 
 	UPROPERTY(Transient)
 	TMap<TSubclassOf<AActor>, FPoolArray> PoolByClasses;
+
+	UPROPERTY(Transient)
+	int32 CollectedCoins = 0;
+
+	UPROPERTY(Transient)
+	TObjectPtr<URunWidgetController> RunWidgetController;
+
+	UPROPERTY(Transient)
+	TObjectPtr<URunHUDWidget> RunHUDWidget;
+
 };

@@ -9,6 +9,7 @@ public class EndlessRunnerEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V6;
-		ExtraModuleNames.Add("EndlessRunner");
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
+        ExtraModuleNames.Add("EndlessRunner");
 	}
 }

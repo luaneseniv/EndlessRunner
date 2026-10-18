@@ -1,4 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Luan Nguyen. All Rights Reserved.
+
 
 
 #include "Actor/Coin.h"
@@ -31,6 +32,8 @@ UPoolActorComponent* ACoin::GetPoolActorComponent()
 void ACoin::OnCollected(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	Super::OnCollected(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
 	if (ARunCharacter* RunCharacter = Cast<ARunCharacter>(OtherActor))
 	{
 		RunCharacter->CollectCoin();
